@@ -28,7 +28,7 @@ O sistema monitora e gera trajetórias para os seguintes indicadores:
 | Indicador | Código SGS (Real) | Unidade |
 | :--- | :--- | :--- |
 | **IPCA** | 13522 | Variação acumulada em 12 meses (%) |
-| **PIB Total** | 7328 | Taxa de variação anual (%) |
+| **PIB Total** | 7328 | Acumulado em 4 trimestres |
 | **Selic** | 432 | Taxa Meta definida pelo Copom (% a.a.) |
 | **Câmbio** | 1 | Taxa de câmbio Livre - Venda (R$/US$) |
 

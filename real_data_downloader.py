@@ -2,16 +2,12 @@ import os
 import time
 import pandas as pd
 from bcb import sgs
-from settings.settings import load_config
+import sys, json
 
-
-
-config = load_config()
-
-
-
-
-
+config_path = os.path.join(os.getcwd(), 'config.json')
+with open(config_path) as config_file:
+    config = json.load(config_file)
+    sys.path.append(config['caminho_rede'])
 
 MAPA_SGS = {
     'IPCA (%)': 13522,
@@ -21,7 +17,7 @@ MAPA_SGS = {
 }
 
 def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
-    caminho_arquivo = os.path.join(proj_dir, 'data', arquivo)
+    caminho_arquivo = os.path.join(proj_dir, arquivo)
     
     # Carrega dados existentes para continuar de onde parou
     if os.path.exists(caminho_arquivo):
@@ -37,20 +33,13 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
     for nome, codigo in MAPA_SGS.items():
         print(f"\n--- Processando {nome} (Código: {codigo}) ---")
         
-        # Identifica a última data baixada para este indicador específico
-        df_ind = df_final[df_final['indicador'] == nome]
-        if not df_ind.empty:
-            # Continua a partir do dia seguinte ao último salvo
-            data_inicio = df_ind['data'].max() + pd.Timedelta(days=1)
-        else:
-            data_inicio = pd.to_datetime(data_inicio)
-
+        # Para evitar saltos (degraus) entre as fronteiras dos lotes,
+        # a série é baixada inteira e interpolada como um único bloco.
         atual = pd.to_datetime(data_inicio)
+        df_ind_all = pd.DataFrame()
 
         while atual <= fim_global:
-            # Lotes de 2 anos para evitar o ReadTimeout
-            proximo = atual + pd.DateOffset(years=2)
-            
+            proximo = atual + pd.DateOffset(years=3)
             str_atual = atual.strftime('%Y-%m-%d')
             str_proximo = min(proximo, fim_global).strftime('%Y-%m-%d')
             
@@ -62,32 +51,36 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
             try:
                 # Requisição à API
                 df_lote = sgs.get({codigo: codigo}, start=str_atual, end=str_proximo)
-                
                 if not df_lote.empty:
-                    # Padroniza para o último dia do mês para bater com o Focus
-                    df_lote = df_lote.resample('ME').last().ffill().dropna().reset_index()
-                    df_lote = df_lote.rename(columns={'Date': 'data', codigo: 'valor'})
-                    df_lote['indicador'] = nome
-                    
-                    # Adiciona ao dataframe principal e remove duplicatas residuais
-                    df_final = pd.concat([df_final, df_lote], ignore_index=True)
-                    df_final = df_final.drop_duplicates(subset=['data', 'indicador'], keep='last')
-                    
-                    # Salva no disco IMEDIATAMENTE após o sucesso do lote
-                    df_final.to_csv(caminho_arquivo, index=False)
-                    print(f"OK. Salvo no CSV.")
+                    df_ind_all = pd.concat([df_ind_all, df_lote])
+                    print("OK.")
                 else:
                     print("Vazio.")
 
             except Exception as e:
                 print(f"\n[ERRO] Falha ao baixar o período {str_atual} - {str_proximo}: {e}")
-                print("Interrompendo este indicador para evitar loop de erros. Tente rodar novamente mais tarde.")
-                break # Pula para o próximo indicador se o servidor recusar a conexão
+                break
 
             atual = proximo + pd.Timedelta(days=1)
+            time.sleep(1)
             
-            # Pausa de 3 segundos entre as requisições para evitar rate limit / timeout
-            time.sleep(3)
+        if not df_ind_all.empty:
+            df_ind_all = df_ind_all[~df_ind_all.index.duplicated(keep='first')]
+            
+            # Reduz a frequência para o último dia do mês
+            df_ind_all = df_ind_all.resample('ME').last()
+            
+            # Interpolação linear transforma os dados trimestrais do PIB em curvas contínuas
+            df_ind_all = df_ind_all.interpolate(method='linear').dropna().reset_index()
+            
+            df_ind_all = df_ind_all.rename(columns={'Date': 'data', codigo: 'valor'})
+            df_ind_all['indicador'] = nome
+            
+            # Atualiza o arquivo final de forma limpa, substituindo todo o indicador
+            df_final = df_final[df_final['indicador'] != nome]
+            df_final = pd.concat([df_final, df_ind_all], ignore_index=True)
+            
+            df_final.to_csv(caminho_arquivo, index=False)
 
 if __name__ == "__main__":
-    baixar_dados_sgs(proj_dir = os.getcwd(), data_inicio='2010-01-01')
+    baixar_dados_sgs(proj_dir=os.getcwd(), data_inicio='2010-01-01', arquivo='dados_sgs.csv')
