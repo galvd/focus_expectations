@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard Focus FUCAPE</title>
+    <style>
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; }
+        /* Largura total sem limite máximo */
+        .container { width: 100%; margin: auto; }
+        .header { text-align: center; margin-bottom: 40px; }
+        /* Estrutura em bloco, ocupa toda a extensão horizontal */
+        .card { background: white; padding: 20px; margin-bottom: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+        /* Altura aumentada para 750px */
+        iframe { width: 100%; height: 750px; border: none; }
+        h2 { text-align: center; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Monitor de Expectativas: Focus vs Realizado</h1>
+            <p>Atualização Automática Semanal</p>
+        </div>
+        
+        <div class="card">
+            <h2>PIB Acumulado 4 Trimestres</h2>
+            <iframe src="charts/interativo/trajetoria_PIB_Acum._4tri_pct.html"></iframe>
+        </div>
+        
+        <div class="card">
+            <h2>IPCA</h2>
+            <iframe src="charts/interativo/trajetoria_IPCA_pct.html"></iframe>
+        </div>
+
+        <div class="card">
+            <h2>Taxa Selic</h2>
+            <iframe src="charts/interativo/trajetoria_Selic_pct_a.a.html"></iframe>
+        </div>
+
+        <div class="card">
+            <h2>Taxa de Câmbio</h2>
+            <iframe src="charts/interativo/trajetoria_Taxa_de_Câmbio_RUS.html"></iframe>
+        </div>
+    </div>
+</body>
+</html>
