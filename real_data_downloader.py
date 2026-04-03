@@ -16,7 +16,7 @@ MAPA_SGS = {
 }
 
 def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
-    caminho_arquivo = os.path.join(proj_dir, arquivo)
+    caminho_arquivo = os.path.join(proj_dir, 'data', arquivo)
     
     # Carrega dados existentes para continuar de onde parou
     if os.path.exists(caminho_arquivo):
