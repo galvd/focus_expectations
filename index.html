@@ -2,45 +2,127 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <title>Dashboard Focus FUCAPE</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Monitor de Expectativas: Realizado vs Boletim Focus</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; }
-        /* Largura total sem limite máximo */
-        .container { width: 100%; margin: auto; }
-        .header { text-align: center; margin-bottom: 40px; }
-        /* Estrutura em bloco, ocupa toda a extensão horizontal */
-        .card { background: white; padding: 20px; margin-bottom: 40px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        /* Altura aumentada para 750px */
-        iframe { width: 100%; height: 750px; border: none; }
-        h2 { text-align: center; }
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --bg: #f8f9fa;
+            --text: #333;
+        }
+
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background-color: var(--bg); 
+            color: var(--text); 
+            margin: 0; 
+            padding: 20px; 
+        }
+
+        .container { max-width: 1200px; margin: auto; }
+
+        .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        
+        /* Disclaimer de Performance */
+        .disclaimer { 
+            background: #fff3cd; 
+            color: #856404; 
+            padding: 10px; 
+            border-radius: 5px; 
+            font-size: 0.9rem; 
+            margin-bottom: 20px; 
+            border: 1px solid #ffeeba;
+        }
+
+        /* Estilo das Janelas Retráteis */
+        details {
+            background: white;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            overflow: hidden;
+            border: 1px solid #ddd;
+        }
+
+        summary {
+            padding: 15px 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            cursor: pointer;
+            list-style: none;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: background 0.3s;
+        }
+
+        summary:hover { background: #f1f1f1; }
+        summary::after { content: "▶"; font-size: 0.8rem; transition: transform 0.3s; }
+        details[open] summary::after { transform: rotate(90deg); }
+        details[open] summary { border-bottom: 1px solid #eee; background: #fafafa; }
+
+        .content { padding: 20px; }
+        iframe { width: 100%; height: 700px; border: none; }
+
+        /* Links e Rodapé */
+        .links-topo { margin: 15px 0; line-height: 1.6; }
+        .links-topo a { color: var(--accent); text-decoration: none; font-weight: bold; }
+        .links-topo a:hover { text-decoration: underline; }
+
+        .footer { text-align: center; margin-top: 50px; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
+
     <div class="container">
-        <div class="header">
-            <h1>Monitor de Expectativas: Focus vs Realizado</h1>
+        <header class="header">
+            <h1>Monitor de Expectativas: Realizado vs Expectativas Boletim Focus</h1>
             <p>Atualização Automática Semanal</p>
-        </div>
-        
-        <div class="card">
-            <h2>PIB Acumulado 4 Trimestres</h2>
-            <iframe src="charts/interativo/trajetoria_PIB_Acum._4tri_pct.html"></iframe>
-        </div>
-        
-        <div class="card">
-            <h2>IPCA</h2>
-            <iframe src="charts/interativo/trajetoria_IPCA_pct.html"></iframe>
-        </div>
+            
+            <div class="links-topo">
+                <p>Construído e mantido por <strong>Daniel Galvêas</strong> - <a href="https://github.com/galvd" target="_blank">github.com/galvd</a></p>
+                <p>Para visualizar a versão estática dos gráficos, <a href="https://github.com/galvd/focus_expectations/blob/main/charts/index.md" target="_blank">clique aqui</a>.</p>
+                <p>Para visualizar o repositório do projeto no Github, <a href="https://github.com/galvd/focus_expectations" target="_blank">clique aqui</a>.</p>
+            </div>
 
-        <div class="card">
-            <h2>Taxa Selic</h2>
-            <iframe src="charts/interativo/trajetoria_Selic_pct_a.a.html"></iframe>
-        </div>
+            <div class="disclaimer">
+                ⚠️ <strong>Nota:</strong> O carregamento dos gráficos pode ser lento devido ao elevado volume de dados processados em cada série histórica.
+            </div>
+        </header>
 
-        <div class="card">
-            <h2>Taxa de Câmbio</h2>
-            <iframe src="charts/interativo/trajetoria_Taxa_de_Câmbio_RUS.html"></iframe>
-        </div>
+        <details>
+            <summary>Expectativas sobre o PIB Anual (Série Suavizada)</summary>
+            <div class="content">
+                <iframe src="charts/interativo/trajetoria_PIB_Acum._4tri_pct.html" loading="lazy"></iframe>
+            </div>
+        </details>
+
+        <details>
+            <summary>Expectativas sobre a Inflação (IPCA)</summary>
+            <div class="content">
+                <iframe src="charts/interativo/trajetoria_IPCA_pct.html" loading="lazy"></iframe>
+            </div>
+        </details>
+
+        <details>
+            <summary>Expectativas sobre a Taxa Selic</summary>
+            <div class="content">
+                <iframe src="charts/interativo/trajetoria_Selic_pct_a.a.html" loading="lazy"></iframe>
+            </div>
+        </details>
+
+        <details>
+            <summary>Expectativas sobre a Taxa de Câmbio</summary>
+            <div class="content">
+                <iframe src="charts/interativo/trajetoria_Taxa_de_Câmbio_RUS.html" loading="lazy"></iframe>
+            </div>
+        </details>
+
+        <footer class="footer">
+            © 2026 Monitor de Expectativas Econômicas
+        </footer>
     </div>
+
 </body>
 </html>
