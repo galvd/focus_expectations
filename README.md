@@ -28,9 +28,15 @@ O sistema monitora e gera trajetórias para os seguintes indicadores:
 | Indicador | Código SGS (Real) | Unidade |
 | :--- | :--- | :--- |
 | **IPCA** | 13522 | Variação acumulada em 12 meses (%) |
-| **PIB Total** | 7328 | Acumulado em 4 trimestres |
+| **PIB (Acum. 4tri)** | 22109 | Acumulado em 4 trimestres (ajustado no código) |
 | **Selic** | 432 | Taxa Meta definida pelo Copom (% a.a.) |
 | **Câmbio** | 1 | Taxa de câmbio Livre - Venda (R$/US$) |
+
+## Metodologia do PIB
+Para garantir a comparabilidade com as expectativas de mercado, o **PIB Total (%)** é processado a partir da série de índice de volume (SGS 22109). 
+* **Cálculo**: Variação acumulada de 4 trimestres.
+* **Ancoragem**: Série ancorada em 2009 para refletir o crescimento real de **7,53%** em 2010.
+* **Suavização**: Interpolação linear mensal para eliminar o efeito de "escada" dos dados trimestrais.
 
 ## Lógica de Visualização
 

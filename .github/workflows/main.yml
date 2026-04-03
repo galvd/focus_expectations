@@ -23,29 +23,37 @@ jobs:
       - name: Instalar dependências
         run: |
           python -m pip install --upgrade pip
-          pip install pandas matplotlib python-bcb
+          pip install pandas matplotlib python-bcb plotly
 
       - name: Preparar ambiente
         run: |
           mkdir -p data
-          # O config.json aponta para a raiz onde as funções buscarão /data/
           echo "{
             \"caminho_rede\": \"$GITHUB_WORKSPACE\"
           }" > settings/config.json
 
-      - name: Executar script
+      - name: Executar script principal
         run: python main.py
 
-      - name: Limpeza e Commit
-        if: always()
+      - name: Commit dos gráficos estáticos (PNG) na branch principal
         run: |
-          # Remove configurações e dados brutos
           rm -f settings/config.json
           rm -rf data
-          
-          # Configura Git para commit
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
           git add charts/*.png
-          git commit -m "Autodeploy: Atualização Focus $(date +'%Y-%m-%d')" || exit 0
+          git commit -m "Autodeploy: Atualização PNGs Focus $(date +'%Y-%m-%d')" || true
           git push
+
+      - name: Preparar arquivos para o Dashboard Interativo
+        run: |
+          mkdir -p public/charts/interativo
+          cp index.html public/
+          cp charts/interativo/*.html public/charts/interativo/
+
+      - name: Deploy no GitHub Pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          keep_files: false
