@@ -12,13 +12,13 @@ config = load_config()
 
 
 def carregar_dados(proj_dir, arquivo_focus, arquivo_sgs):
-    df_focus = pd.read_csv(os.path.join(proj_dir, arquivo_focus))
+    df_focus = pd.read_csv(os.path.join(proj_dir, 'data', arquivo_focus))
     
     # Adicionado format='mixed' para evitar falhas de inferência de data
     df_focus['data_boletim'] = pd.to_datetime(df_focus['data_boletim'], format='mixed')
     df_focus['data_alvo'] = pd.to_datetime(df_focus['periodo_previsao'].astype(str) + '-12-31')
     
-    df_sgs = pd.read_csv(os.path.join(proj_dir, arquivo_sgs))
+    df_sgs = pd.read_csv(os.path.join(proj_dir,'data',  arquivo_sgs))
     df_sgs['data'] = pd.to_datetime(df_sgs['data'], format='mixed')
     
     return df_focus, df_sgs

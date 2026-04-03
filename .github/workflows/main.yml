@@ -22,34 +22,27 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas matplotlib python-bcb
 
-      - name: Preparar ambiente (Pastas e Config)
+      - name: Preparar ambiente
         run: |
-          # Cria a pasta data na raiz do repositório
           mkdir -p data
-          # Cria o config.json apontando para o workspace do runner
+          # O config.json aponta para a raiz onde as funções buscarão /data/
           echo "{
             \"caminho_rede\": \"$GITHUB_WORKSPACE\"
           }" > settings/config.json
 
-      - name: Executar script de coleta e geração de gráficos
+      - name: Executar script
         run: python main.py
 
-      - name: Limpar arquivos temporários e cache
+      - name: Limpeza e Commit
         if: always()
         run: |
-          # Remove o config.json para não ser commitado
+          # Remove configurações e dados brutos
           rm -f settings/config.json
-          # Remove a pasta data e todo o seu conteúdo (CSVs baixados)
           rm -rf data
-
-      - name: Commit e Push das atualizações
-        run: |
+          
+          # Configura Git para commit
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
-          
-          # Adiciona apenas os novos gráficos gerados
           git add charts/*.png
-          
-          # Commit apenas se houver mudanças nos gráficos
-          git commit -m "Autodeploy: Atualização semanal das expectativas Focus $(date +'%Y-%m-%d')" || exit 0
+          git commit -m "Autodeploy: Atualização Focus $(date +'%Y-%m-%d')" || exit 0
           git push
