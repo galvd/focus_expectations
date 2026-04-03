@@ -22,9 +22,11 @@ jobs:
           python -m pip install --upgrade pip
           pip install pandas matplotlib python-bcb
 
-      - name: Criar config.json temporário
+      - name: Preparar ambiente (Pastas e Config)
         run: |
-          # Define o caminho para a raiz do repositório no ambiente do runner
+          # Cria a pasta data na raiz do repositório
+          mkdir -p data
+          # Cria o config.json apontando para o workspace do runner
           echo "{
             \"caminho_rede\": \"$GITHUB_WORKSPACE\"
           }" > settings/config.json
@@ -32,14 +34,22 @@ jobs:
       - name: Executar script de coleta e geração de gráficos
         run: python main.py
 
-      - name: Remover config.json
-        if: always() # Garante que o arquivo seja deletado mesmo se o script falhar
-        run: rm settings/config.json
+      - name: Limpar arquivos temporários e cache
+        if: always()
+        run: |
+          # Remove o config.json para não ser commitado
+          rm -f settings/config.json
+          # Remove a pasta data e todo o seu conteúdo (CSVs baixados)
+          rm -rf data
 
       - name: Commit e Push das atualizações
         run: |
           git config --global user.name "GitHub Action"
           git config --global user.email "action@github.com"
+          
+          # Adiciona apenas os novos gráficos gerados
           git add charts/*.png
+          
+          # Commit apenas se houver mudanças nos gráficos
           git commit -m "Autodeploy: Atualização semanal das expectativas Focus $(date +'%Y-%m-%d')" || exit 0
           git push
