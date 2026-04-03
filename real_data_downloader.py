@@ -2,12 +2,11 @@ import os
 import time
 import pandas as pd
 from bcb import sgs
-import sys, json
+from settings.settings import load_config
 
-config_path = os.path.join(os.getcwd(), 'config.json')
-with open(config_path) as config_file:
-    config = json.load(config_file)
-    sys.path.append(config['caminho_rede'])
+
+
+config = load_config()
 
 MAPA_SGS = {
     'IPCA (%)': 13522,
