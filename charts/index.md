@@ -1,10 +1,20 @@
 # 📈 Dashboard: Expectativas de Mercado (Focus/BCB)
 
-Este painel apresenta as trajetórias das expectativas de mercado coletadas semanalmente pelo Banco Central do Brasil e expressadas pela medianda das expectativas das instituições financeiras consultadas.
+**[👉 Acesse o Dashboard Interativo clicando aqui](https://galvd.github.io/focus_expectations/)**
+
+Este painel estático apresenta as trajetórias das expectativas de mercado coletadas semanalmente pelo Banco Central do Brasil e expressadas pela medianda das expectativas das instituições financeiras consultadas.
+
+## 📌 Painel Resumo: Últimos Valores Disponíveis
+| Indicador | Dado Realizado | Expectativa Focus (Ano Corrente) |
+| :--- | :---: | :---: |
+| **PIB Acum. 4tri** | N/D| N/D|
+| **IPCA** | N/D| N/D|
+| **Taxa Selic** | N/D| N/D|
+| **Câmbio** | N/D| N/D|
 
 ---
 
-## 📊 Crecimento Anual do PIB Nacional (%)
+## 📊 Crescimento Anual do PIB Nacional (%)
 Expectativas de crescimento do Produto Interno Bruto.
 <img src="./trajetoria_PIB_Acum._4tri_pct.png" width="100%">
 

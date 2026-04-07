@@ -1,9 +1,10 @@
 import os
-from real_data_downloader import baixar_dados_sgs
-from focus_downloader import atualizar_dados_api
-from chart_visuals import carregar_dados, plotar_trajetorias
-from dashboard_generator import gerar_dashboard_interativo
+from pyfiles.real_data_downloader import baixar_dados_sgs
+from pyfiles.focus_downloader import atualizar_dados_api
+from pyfiles.chart_visuals import carregar_dados, plotar_trajetorias
+from pyfiles.dashboard_generator import gerar_dashboard_interativo
 from settings.settings import load_config
+from pyfiles.update_panels import atualizar_paineis
 
 # Carregamento de configurações
 config = load_config()
@@ -43,5 +44,8 @@ if __name__ == "__main__":
         )
     else:
         print("Erro: Arquivos de dados não encontrados para a geração do dashboard.")
+
+    print("\n--- ETAPA 6: Atualização dos Painéis HTML/MD ---")
+    atualizar_paineis()
     
     print("\nPipeline finalizado com sucesso.")
