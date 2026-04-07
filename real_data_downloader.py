@@ -6,7 +6,6 @@ from settings.settings import load_config
 
 config = load_config()
 
-# Os nomes aqui DEVEM ser idênticos aos definidos no focus_downloader.py
 MAPA_SGS = {
     'IPCA (%)': 13522,
     'Selic (% a.a)': 432,
@@ -28,13 +27,11 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
     for nome, codigo in MAPA_SGS.items():
         print(f"\n--- Processando {nome} (Código: {codigo}) ---")
         
-        # PIB precisa da base de 2009 para calcular a variação de 2010
         data_busca = '2009-01-01' if nome == 'PIB Acum. 4tri (%)' else data_inicio
-        
         atual = pd.to_datetime(data_busca)
         df_ind_all = pd.DataFrame()
 
-        # Restauração da lógica de lotes (Chunking) para evitar timeout em séries diárias
+        # Lógica de Lotes com Sistema de "Retries" para o GitHub Actions
         while atual <= fim_global:
             proximo = atual + pd.DateOffset(years=3)
             str_atual = atual.strftime('%Y-%m-%d')
@@ -42,17 +39,27 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
             
             if str_atual > str_proximo:
                 break
+                
+            sucesso_lote = False
             
-            try:
-                df_lote = sgs.get({codigo: codigo}, start=str_atual, end=str_proximo)
-                if not df_lote.empty:
-                    df_ind_all = pd.concat([df_ind_all, df_lote])
-            except Exception as e:
-                print(f"[ERRO] Falha ao baixar o período {str_atual} - {str_proximo} para {nome}: {e}")
-                break # Sai do loop deste indicador se a API travar
+            # Tenta baixar o mesmo lote 3 vezes antes de pular
+            for tentativa in range(1, 4):
+                try:
+                    df_lote = sgs.get({codigo: codigo}, start=str_atual, end=str_proximo)
+                    if not df_lote.empty:
+                        df_ind_all = pd.concat([df_ind_all, df_lote])
+                    sucesso_lote = True
+                    break  # Se deu certo, sai do loop de tentativas
+                except Exception as e:
+                    print(f"  [Aviso] Falha na tentativa {tentativa}/3 para o período {str_atual}-{str_proximo}. Aguardando 3s...")
+                    time.sleep(10) # Pausa estratégica para a API "esquecer" o bloqueio
+            
+            if not sucesso_lote:
+                print(f"  [ERRO FATAL] API do BCB bloqueou o download de {str_atual} a {str_proximo}. Os dados mais recentes podem faltar.")
+                break # Interrompe a busca desse indicador se falhar 3 vezes
             
             atual = proximo + pd.Timedelta(days=1)
-            time.sleep(0.5)
+            time.sleep(5) # Pausa leve entre lotes bem sucedidos
 
         if not df_ind_all.empty:
             df_ind_all = df_ind_all[~df_ind_all.index.duplicated(keep='first')]
@@ -76,7 +83,7 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
             df_ind_all = df_ind_all.rename(columns={'Date': 'data', 'valor_calculado': 'valor'})
             df_ind_all['indicador'] = nome
             
-            # Filtro para remover o ano sintético de 2009 e garantir ponto de partida exato
+            # Limpa base antes de inserir no CSV final
             df_ind_all = df_ind_all[df_ind_all['data'] >= pd.to_datetime(data_inicio)]
             df_ind_all = df_ind_all[['data', 'indicador', 'valor']]
             
@@ -88,9 +95,7 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
             df_final.to_csv(caminho_arquivo, index=False)
             print(f"Sucesso: {nome} atualizado.")
         else:
-            print(f"Aviso: SGS retornou dados vazios para {nome}.")
-
-        time.sleep(2)
+            print(f"Aviso: SGS retornou dados totalmente vazios para {nome}.")
 
 if __name__ == "__main__":
     baixar_dados_sgs(proj_dir=os.getcwd(), data_inicio='2010-01-01', arquivo='dados_sgs.csv')

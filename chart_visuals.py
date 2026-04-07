@@ -100,7 +100,7 @@ def plotar_trajetorias(indicador, df_focus, df_sgs, data_inicio):
     print(f"Gráfico salvo: {os.path.join(pasta_charts, f"trajetoria_{nome_fmt}.png")}")
 
 if __name__ == "__main__":
-    df_f, df_s = carregar_dados(proj_dir=os.getcwd())
+    df_f, df_s = carregar_dados(proj_dir=config.get('caminho_rede'), arquivo_focus='dados_focus.csv', arquivo_sgs='dados_sgs.csv')
     
     indicadores = df_s['indicador'].unique()
     for ind in indicadores:
