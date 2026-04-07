@@ -1,4 +1,4 @@
-# 📈 Dashboard: Expectativas de Mercado (Focus/BCB)
+# 📈 Monitor de Expectativas Econômicas: Séries Reais vs Expectativas Boletim Focus
 
 **[👉 Acesse o Dashboard Interativo clicando aqui](https://galvd.github.io/focus_expectations/)**
 
