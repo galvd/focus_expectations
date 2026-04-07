@@ -1,12 +1,11 @@
 # Monitor de Expectativas Econômicas: Séries Reais vs Expectativas Boletim Focus
 
+Este projeto automatiza a coleta, o processamento e a visualização de dados econômicos brasileiros. Ele confronta as expectativas anuais do **Boletim Focus** (Banco Central do Brasil) com os dados reais extraídos do **SGS (Sistema Gerenciador de Séries Temporais)**, gerando gráficos de trajetórias ("fan charts") que permitem visualizar a evolução das previsões ao longo do tempo. As informações estão agregadas nos dashboards abaixo. O dashboard estático carrega mais rapidamente, porém não permite intereção com os pontos de dados nos gráficos.
+
 
 **[Clique aqui para acessar Dashboard Interativo](https://galvd.github.io/focus_expectations/)**
 
 **[Clique aqui para acessar Dashboard Estático](https://github.com/galvd/focus_expectations/blob/main/charts/index.md)**
-
-Este projeto automatiza a coleta, o processamento e a visualização de dados econômicos brasileiros. Ele confronta as expectativas anuais do **Boletim Focus** (Banco Central do Brasil) com os dados reais extraídos do **SGS (Sistema Gerenciador de Séries Temporais)**, gerando gráficos de trajetórias ("fan charts") que permitem visualizar a evolução das previsões ao longo do tempo. 
-
 
 
 ## Estrutura do Projeto

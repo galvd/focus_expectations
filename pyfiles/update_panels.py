@@ -8,13 +8,13 @@ import os
 
 TEMPLATE_MD = """# 📈 Dashboard: Expectativas de Mercado (Focus/BCB)
 
-**[👉 Acesse o Dashboard Interativo clicando aqui](https://galvd.github.io/focus_expectations/)**
+**[Acesse o Dashboard Interativo clicando aqui](https://galvd.github.io/focus_expectations/)**
 
 **Última atualização:** __DATA_ATUALIZACAO__
 
 Este painel estático apresenta as trajetórias das expectativas de mercado coletadas semanalmente pelo Banco Central do Brasil e expressadas pela medianda das expectativas das instituições financeiras consultadas.
 
-## 📌 Painel Resumo: Últimos Valores e Tendências
+## Painel Resumo: Últimos Valores e Tendências
 *(Comparações referentes à semana anterior: ▲ Subiu, ▼ Desceu, = Manteve)*
 
 | 🔹 PIB (série real suavizada) | 🔹 IPCA | 🔹 Taxa Selic | 🔹 Câmbio |
@@ -23,25 +23,25 @@ Este painel estático apresenta as trajetórias das expectativas de mercado cole
 
 ---
 
-## 📊 Expectativas sobre o PIB Anual (Série Suavizada)
+## Expectativas sobre o PIB Anual (Série Suavizada)
 Expectativas de crescimento do Produto Interno Bruto.
 <img src="./trajetoria_PIB_Acum._4tri_pct.png" width="100%">
 
 ---
 
-## 📈 Expectativas sobre a Inflação (IPCA)
+## Expectativas sobre a Inflação (IPCA)
 Expectativas de inflação oficial (IPCA).
 <img src="./trajetoria_IPCA_pct.png" width="100%">
 
 ---
 
-## 🏦 Expectativas sobre a Taxa Selic
+## Expectativas sobre a Taxa Selic
 Projeções para a taxa básica de juros da economia.
 <img src="./trajetoria_Selic_pct_a.a.png" width="100%">
 
 ---
 
-## 💵 Expectativas sobre a Taxa de Câmbio
+## Expectativas sobre a Taxa de Câmbio
 Acompanhamento da trajetória esperada para a taxa de câmbio.
 <img src="./trajetoria_Taxa_de_Câmbio_RUS.png" width="100%">
 
