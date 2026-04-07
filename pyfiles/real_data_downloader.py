@@ -16,9 +16,12 @@ MAPA_SGS = {
 def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
     caminho_arquivo = os.path.join(proj_dir, 'data', arquivo)
     
+    # 1. Carrega base existente se houver
+    df_existente = pd.DataFrame()
     if os.path.exists(caminho_arquivo):
-        df_final = pd.read_csv(caminho_arquivo)
-        df_final['data'] = pd.to_datetime(df_final['data'], format='mixed')
+        df_existente = pd.read_csv(caminho_arquivo)
+        df_existente['data'] = pd.to_datetime(df_existente['data'], format='mixed')
+        df_final = df_existente.copy()
     else:
         df_final = pd.DataFrame(columns=['data', 'indicador', 'valor'])
 
@@ -27,11 +30,27 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
     for nome, codigo in MAPA_SGS.items():
         print(f"\n--- Processando {nome} (Código: {codigo}) ---")
         
-        data_busca = '2009-01-01' if nome == 'PIB Acum. 4tri (%)' else data_inicio
+        # 2. Definição Dinâmica da Data de Busca (Otimização)
+        data_busca = data_inicio
+        
+        if nome == 'PIB Acum. 4tri (%)':
+            # PIB precisa baixar desde 2009 para garantir o cálculo da janela móvel (rolling window)
+            data_busca = '2009-01-01'
+        elif not df_existente.empty and nome in df_existente['indicador'].values:
+            # Encontra a última data registrada no CSV para este indicador
+            ultima_data = df_existente[df_existente['indicador'] == nome]['data'].max()
+            
+            # Volta 2 meses para ter uma margem de segurança na interpolação e resample
+            data_otimizada = ultima_data - pd.DateOffset(months=2)
+            data_busca = data_otimizada.strftime('%Y-%m-%d')
+            print(f"  -> Histórico identificado. Baixando apenas a atualização a partir de {data_busca}")
+        else:
+            print(f"  -> Primeira execução para o indicador. Baixando desde {data_busca}")
+
         atual = pd.to_datetime(data_busca)
         df_ind_all = pd.DataFrame()
 
-        # Lógica de Lotes com Sistema de "Retries" para o GitHub Actions
+        # 3. Lógica de Lotes com Sistema de "Retries"
         while atual <= fim_global:
             proximo = atual + pd.DateOffset(years=3)
             str_atual = atual.strftime('%Y-%m-%d')
@@ -51,16 +70,17 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
                     sucesso_lote = True
                     break  # Se deu certo, sai do loop de tentativas
                 except Exception as e:
-                    print(f"  [Aviso] Falha na tentativa {tentativa}/3 para o período {str_atual}-{str_proximo}. Aguardando 3s...")
-                    time.sleep(10) # Pausa estratégica para a API "esquecer" o bloqueio
+                    print(f"  [Aviso] Falha na tentativa {tentativa}/3 para {str_atual}-{str_proximo}. Aguardando 3s...")
+                    time.sleep(3) 
             
             if not sucesso_lote:
-                print(f"  [ERRO FATAL] API do BCB bloqueou o download de {str_atual} a {str_proximo}. Os dados mais recentes podem faltar.")
-                break # Interrompe a busca desse indicador se falhar 3 vezes
+                print(f"  [ERRO FATAL] API do BCB bloqueou o download de {str_atual} a {str_proximo}.")
+                break 
             
             atual = proximo + pd.Timedelta(days=1)
-            time.sleep(5) # Pausa leve entre lotes bem sucedidos
+            time.sleep(1)
 
+        # 4. Processamento dos Dados
         if not df_ind_all.empty:
             df_ind_all = df_ind_all[~df_ind_all.index.duplicated(keep='first')]
             
@@ -83,19 +103,30 @@ def baixar_dados_sgs(proj_dir, data_inicio, arquivo):
             df_ind_all = df_ind_all.rename(columns={'Date': 'data', 'valor_calculado': 'valor'})
             df_ind_all['indicador'] = nome
             
-            # Limpa base antes de inserir no CSV final
+            # Garante filtro a partir de 2010-01-01 global
             df_ind_all = df_ind_all[df_ind_all['data'] >= pd.to_datetime(data_inicio)]
             df_ind_all = df_ind_all[['data', 'indicador', 'valor']]
             
-            # --- Atualização do CSV ---
-            df_final = df_final[df_final['indicador'] != nome].copy()
-            df_final = pd.concat([df_final, df_ind_all], ignore_index=True)
+            # --- Substituição e Merge Seguro na Base ---
+            if not df_final.empty:
+                # Remove os dados antigos deste indicador APENAS no trecho de tempo recém-baixado
+                # Isso impede duplicações e preserva os dados históricos intocados
+                condicao_remover = (df_final['indicador'] == nome) & (df_final['data'] >= pd.to_datetime(data_busca))
+                df_final = df_final[~condicao_remover]
             
-            os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
-            df_final.to_csv(caminho_arquivo, index=False)
-            print(f"Sucesso: {nome} atualizado.")
+            # Anexa o trecho novo/atualizado ao histórico
+            df_final = pd.concat([df_final, df_ind_all], ignore_index=True)
+            print(f"  -> Sucesso: {nome} atualizado e integrado ao histórico.")
+            
         else:
-            print(f"Aviso: SGS retornou dados totalmente vazios para {nome}.")
+            print(f"  -> Aviso: SGS retornou dados totalmente vazios para {nome}.")
+
+    # 5. Salva o CSV Consolidado
+    if not df_final.empty:
+        df_final = df_final.sort_values(by=['indicador', 'data'])
+        os.makedirs(os.path.dirname(caminho_arquivo), exist_ok=True)
+        df_final.to_csv(caminho_arquivo, index=False)
+        print(f"\n[SGS Downloader] Concluído. Tabela atualizada e salva em: {caminho_arquivo}")
 
 if __name__ == "__main__":
     baixar_dados_sgs(proj_dir=os.getcwd(), data_inicio='2010-01-01', arquivo='dados_sgs.csv')

@@ -3,157 +3,126 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Monitor de Expectativas Econômicas: Séries Reais vs Expectativas Boletim Focus</title>
+    <title>Monitor de Expectativas: Realizado vs Boletim Focus</title>
     <style>
-        :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --bg: #f8f9fa;
-            --text: #333;
-        }
-
-        body { 
-            font-family: 'Segoe UI', system-ui, sans-serif; 
-            background-color: var(--bg); 
-            color: var(--text); 
-            margin: 0; 
-            padding: 20px; 
-        }
-
+        :root { --primary: #2c3e50; --accent: #3498db; --bg: #f8f9fa; --text: #333; }
+        body { font-family: 'Segoe UI', system-ui, sans-serif; background-color: var(--bg); color: var(--text); margin: 0; padding: 20px; }
         .container { max-width: 1200px; margin: auto; }
-
         .header { text-align: center; margin-bottom: 30px; border-bottom: 2px solid #eee; padding-bottom: 20px; }
+        .disclaimer { background: #fff3cd; color: #856404; padding: 10px; border-radius: 5px; font-size: 0.9rem; margin-bottom: 20px; border: 1px solid #ffeeba; }
         
-        .disclaimer { 
-            background: #fff3cd; 
-            color: #856404; 
-            padding: 10px; 
-            border-radius: 5px; 
-            font-size: 0.9rem; 
-            margin-bottom: 20px; 
-            border: 1px solid #ffeeba;
-        }
-
-        /* Painel de Resumo */
         .summary-panel { margin-bottom: 30px; }
-        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 15px; }
-        .summary-card { background: white; padding: 15px; border-radius: 8px; border-left: 4px solid var(--accent); box-shadow: 0 2px 4px rgba(0,0,0,0.05); }
-        .summary-card h3 { margin: 0 0 10px 0; font-size: 1.1rem; color: var(--primary); }
-        .summary-card p { margin: 5px 0; font-size: 0.95rem; }
-        .val-real { color: #2979FF; font-weight: bold; }
-        .val-focus { color: #424242; font-weight: bold; }
+        .summary-header { margin-bottom: 20px; }
+        .summary-header h2 { margin: 0 0 5px 0; color: var(--primary); font-size: 1.5rem; }
+        .summary-header p { margin: 0; color: #666; font-style: italic; font-size: 0.95rem; }
+        
+        .summary-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 20px; }
+        .summary-card { background: white; padding: 20px; border-radius: 8px; border-top: 4px solid var(--accent); box-shadow: 0 4px 6px rgba(0,0,0,0.05); }
+        .summary-card h3 { margin: 0 0 15px 0; font-size: 1.2rem; color: var(--primary); border-bottom: 1px solid #eee; padding-bottom: 10px; }
+        .val-real { color: #2979FF; font-weight: bold; font-size: 1.1rem;}
+        
+        .focus-box { margin-top: 15px; padding-top: 10px; font-size: 0.95rem; }
+        .focus-row { display: flex; justify-content: space-between; margin-bottom: 8px; align-items: center; }
+        .focus-row span:first-child { color: #666; font-weight: 600; }
+        .trend { font-weight: bold; margin-left: 5px; font-size: 0.9rem; color: #555; }
 
-        details {
-            background: white;
-            margin-bottom: 15px;
-            border-radius: 8px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-            overflow: hidden;
-            border: 1px solid #ddd;
-        }
-
-        summary {
-            padding: 15px 20px;
-            font-size: 1.2rem;
-            font-weight: bold;
-            cursor: pointer;
-            list-style: none;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: background 0.3s;
-        }
-
+        details { background: white; margin-bottom: 15px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); overflow: hidden; border: 1px solid #ddd; }
+        summary { padding: 15px 20px; font-size: 1.2rem; font-weight: bold; cursor: pointer; list-style: none; display: flex; justify-content: space-between; align-items: center; transition: background 0.3s; }
         summary:hover { background: #f1f1f1; }
         summary::after { content: "▶"; font-size: 0.8rem; transition: transform 0.3s; }
         details[open] summary::after { transform: rotate(90deg); }
         details[open] summary { border-bottom: 1px solid #eee; background: #fafafa; }
-
         .content { padding: 20px; }
         iframe { width: 100%; height: 700px; border: none; }
-
         .links-topo { margin: 15px 0; line-height: 1.6; }
         .links-topo a { color: var(--accent); text-decoration: none; font-weight: bold; }
         .links-topo a:hover { text-decoration: underline; }
-
         .footer { text-align: center; margin-top: 50px; padding: 20px; font-size: 0.9rem; border-top: 1px solid #eee; }
     </style>
 </head>
 <body>
-
     <div class="container">
         <header class="header">
-            <h1>Monitor de Expectativas Econômicas: Séries Reais vs Expectativas Boletim Focus</h1>
-            <p>Atualização Automática Semanal</p>
-            
+            <h1>Monitor de Expectativas: Realizado vs Expectativas Boletim Focus</h1>
+            <p>Última atualização: 07/04/2026</p>
             <div class="links-topo">
                 <p>Construído e mantido por <strong>Daniel Galvêas</strong> - <a href="https://github.com/galvd" target="_blank">github.com/galvd</a></p>
                 <p>Para visualizar a versão estática dos gráficos, <a href="https://github.com/galvd/focus_expectations/blob/main/charts/index.md" target="_blank">clique aqui</a>.</p>
                 <p>Para visualizar o repositório do projeto no Github, <a href="https://github.com/galvd/focus_expectations" target="_blank">clique aqui</a>.</p>
             </div>
-
             <div class="disclaimer">
                 ⚠️ <strong>Nota:</strong> O carregamento dos gráficos pode ser lento devido ao elevado volume de dados processados em cada série histórica.
             </div>
         </header>
-
+        
         <div class="summary-panel">
+            <div class="summary-header">
+                <h2>Painel Resumo: Últimos Valores e Tendências</h2>
+                <p>(Comparações referentes à semana anterior: ▲ Subiu, ▼ Desceu, = Manteve)</p>
+            </div>
+            
             <div class="summary-grid">
+                
                 <div class="summary-card">
-                    <h3>PIB Acum. 4tri</h3>
-                    <p>Realizado: <span class="val-real">N/D</span></p>
-                    <p>Focus (Atual): <span class="val-focus">N/D</span></p>
+                    <h3>PIB (série real suavizada)</h3>
+                    <p style="margin: 0; color: #555;">Dado Realizado: <span class="val-real">2,60%</span></p>
+                    <div class="focus-box">
+                        <div class="focus-row"><span>2026:</span> <span><strong>1,85%</strong> <span class="trend">(=)</span></span></div>
+                        <div class="focus-row"><span>2027:</span> <span><strong>1,80%</strong> <span class="trend">(=)</span></span></div>
+                        <div class="focus-row"><span>2028:</span> <span><strong>2,00%</strong> <span class="trend">(=)</span></span></div>
+                    </div>
                 </div>
+
                 <div class="summary-card">
                     <h3>IPCA</h3>
-                    <p>Realizado: <span class="val-real">N/D</span></p>
-                    <p>Focus (Atual): <span class="val-focus">N/D</span></p>
+                    <p style="margin: 0; color: #555;">Dado Realizado: <span class="val-real">3,81%</span></p>
+                    <div class="focus-box">
+                        <div class="focus-row"><span>2026:</span> <span><strong>4,36%</strong> <span class="trend">(▲)</span></span></div>
+                        <div class="focus-row"><span>2027:</span> <span><strong>3,85%</strong> <span class="trend">(▲)</span></span></div>
+                        <div class="focus-row"><span>2028:</span> <span><strong>3,60%</strong> <span class="trend">(▲)</span></span></div>
+                    </div>
                 </div>
+
                 <div class="summary-card">
                     <h3>Taxa Selic</h3>
-                    <p>Realizado: <span class="val-real">N/D</span></p>
-                    <p>Focus (Atual): <span class="val-focus">N/D</span></p>
+                    <p style="margin: 0; color: #555;">Dado Realizado: <span class="val-real">14,75%</span></p>
+                    <div class="focus-box">
+                        <div class="focus-row"><span>2026:</span> <span><strong>12,50%</strong> <span class="trend">(=)</span></span></div>
+                        <div class="focus-row"><span>2027:</span> <span><strong>10,50%</strong> <span class="trend">(=)</span></span></div>
+                        <div class="focus-row"><span>2028:</span> <span><strong>10,00%</strong> <span class="trend">(=)</span></span></div>
+                    </div>
                 </div>
+
                 <div class="summary-card">
                     <h3>Câmbio</h3>
-                    <p>Realizado: <span class="val-real">N/D</span></p>
-                    <p>Focus (Atual): <span class="val-focus">N/D</span></p>
+                    <p style="margin: 0; color: #555;">Dado Realizado: <span class="val-real">R$ 5,15</span></p>
+                    <div class="focus-box">
+                        <div class="focus-row"><span>2026:</span> <span><strong>R$ 5,40</strong> <span class="trend">(=)</span></span></div>
+                        <div class="focus-row"><span>2027:</span> <span><strong>R$ 5,45</strong> <span class="trend">(▼)</span></span></div>
+                        <div class="focus-row"><span>2028:</span> <span><strong>R$ 5,50</strong> <span class="trend">(▼)</span></span></div>
+                    </div>
                 </div>
+
             </div>
         </div>
 
         <details>
             <summary>Expectativas sobre o PIB Anual (Série Suavizada)</summary>
-            <div class="content">
-                <iframe src="charts/interativo/trajetoria_PIB_Acum._4tri_pct.html" loading="lazy"></iframe>
-            </div>
+            <div class="content"><iframe src="charts/interativo/trajetoria_PIB_Acum._4tri_pct.html" loading="lazy"></iframe></div>
         </details>
-
         <details>
             <summary>Expectativas sobre a Inflação (IPCA)</summary>
-            <div class="content">
-                <iframe src="charts/interativo/trajetoria_IPCA_pct.html" loading="lazy"></iframe>
-            </div>
+            <div class="content"><iframe src="charts/interativo/trajetoria_IPCA_pct.html" loading="lazy"></iframe></div>
         </details>
-
         <details>
             <summary>Expectativas sobre a Taxa Selic</summary>
-            <div class="content">
-                <iframe src="charts/interativo/trajetoria_Selic_pct_a.a.html" loading="lazy"></iframe>
-            </div>
+            <div class="content"><iframe src="charts/interativo/trajetoria_Selic_pct_a.a.html" loading="lazy"></iframe></div>
         </details>
-
         <details>
             <summary>Expectativas sobre a Taxa de Câmbio</summary>
-            <div class="content">
-                <iframe src="charts/interativo/trajetoria_Taxa_de_Câmbio_RUS.html" loading="lazy"></iframe>
-            </div>
+            <div class="content"><iframe src="charts/interativo/trajetoria_Taxa_de_Câmbio_RUS.html" loading="lazy"></iframe></div>
         </details>
-
-        <footer class="footer">
-           Monitor de Expectativas Econômicas por Daniel Galvêas
-        </footer>
+        <footer class="footer">© 2026 Monitor de Expectativas Econômicas</footer>
     </div>
-
 </body>
 </html>
