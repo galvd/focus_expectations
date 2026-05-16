@@ -17,7 +17,7 @@ Este painel estático apresenta as trajetórias das expectativas de mercado cole
 ## Painel Resumo: Últimos Valores e Tendências
 *(Comparações referentes à semana anterior: ▲ Subiu, ▼ Desceu, = Manteve)*
 
-| 🔹 PIB (série real suavizada) | 🔹 IPCA | 🔹 Taxa Selic | 🔹 Câmbio |
+| 🔹 PIB (série real suavizada) | 🔹 IPCA | 🔹 Taxa Selic | 🔹 Taxa de Câmbio |
 | :--- | :--- | :--- | :--- |
 | **Dado Realizado:**<br>**__REAL_PIB__**<br><br>**__ANO_0__:** __F0_PIB__ __T0_PIB__<br>**__ANO_1__:** __F1_PIB__ __T1_PIB__<br>**__ANO_2__:** __F2_PIB__ __T2_PIB__ | **Dado Realizado:**<br>**__REAL_IPCA__**<br><br>**__ANO_0__:** __F0_IPCA__ __T0_IPCA__<br>**__ANO_1__:** __F1_IPCA__ __T1_IPCA__<br>**__ANO_2__:** __F2_IPCA__ __T2_IPCA__ | **Dado Realizado:**<br>**__REAL_SELIC__**<br><br>**__ANO_0__:** __F0_SELIC__ __T0_SELIC__<br>**__ANO_1__:** __F1_SELIC__ __T1_SELIC__<br>**__ANO_2__:** __F2_SELIC__ __T2_SELIC__ | **Dado Realizado:**<br>**__REAL_CAMBIO__**<br><br>**__ANO_0__:** __F0_CAMBIO__ __T0_CAMBIO__<br>**__ANO_1__:** __F1_CAMBIO__ __T1_CAMBIO__<br>**__ANO_2__:** __F2_CAMBIO__ __T2_CAMBIO__ |
 
@@ -146,7 +146,7 @@ TEMPLATE_HTML = """<!DOCTYPE html>
                 </div>
 
                 <div class="summary-card">
-                    <h3>Câmbio</h3>
+                    <h3>Taxa de Câmbio</h3>
                     <p style="margin: 0; color: #555;">Dado Realizado: <span class="val-real">__REAL_CAMBIO__</span></p>
                     <div class="focus-box">
                         <div class="focus-row"><span>__ANO_0__:</span> <span><strong>__F0_CAMBIO__</strong> <span class="trend">__T0_CAMBIO__</span></span></div>

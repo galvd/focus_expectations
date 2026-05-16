@@ -1,6 +1,6 @@
 import pandas as pd
 import os
-import json
+import time
 from bcb import Expectativas
 from datetime import datetime
 from settings.settings import load_config
@@ -11,7 +11,7 @@ def atualizar_dados_api(proj_dir, data_inicio, arquivo):
     caminho_arquivo = os.path.join(proj_dir, 'data', arquivo)
     df_existente = pd.DataFrame()
 
-    # 1. Verificação de base existente e trava de 7 dias
+    # 1. Verificação de base existente e trava cronológica
     if os.path.exists(caminho_arquivo):
         df_existente = pd.read_csv(caminho_arquivo)
         if not df_existente.empty:
@@ -25,35 +25,39 @@ def atualizar_dados_api(proj_dir, data_inicio, arquivo):
                 print(f"Último dado é de {data_ultima_atualizacao.strftime('%Y-%m-%d')} ({dias_decorridos} dias). Atualização pulada.")
                 return
             
-            # Define data de início para a API (YYYY-MM-DD)
             data_inicio = data_ultima_atualizacao.strftime('%Y-%m-%d')
             print(f"Atualizando base existente a partir de {data_inicio}.")
     else:
         data_inicio = pd.to_datetime(data_inicio).strftime('%Y-%m-%d')
         print(f"Criando nova base a partir de {data_inicio}.")
 
-    # 2. Conexão com a API do BCB
-    em = Expectativas()
-    ep = em.get_endpoint('ExpectativasMercadoAnuais')
-    
+    # 2. Conexão Resiliente com a API do BCB
     indicadores_alvo = ['IPCA', 'PIB Total', 'Câmbio', 'Selic', 'IGP-M']
+    df_raw = pd.DataFrame()
+    sucesso_api = False
 
-    print("Coletando dados via python-bcb...")
+    print("Conectando à API do BCB (Focus)...")
     
-    try:
-        # Query OData
-        df_raw = (ep.query()
-                  .filter(ep.Data >= data_inicio)
-                  .filter(ep.baseCalculo == 0)
-                  .select(ep.Data, ep.Indicador, ep.DataReferencia, ep.Mediana, ep.numeroRespondentes)
-                  .collect())
-    except Exception as e:
-        # Captura JSONDecodeError (instabilidade BCB) ou erros de rede
-        print(f"Erro na conexão com a API do Banco Central: {e}")
-        return
-
-    if df_raw.empty:
-        print("Nenhum dado novo retornado pela API.")
+    # Sistema de tentativas (Retries) envolvendo o setup e a query
+    for tentativa in range(1, 6):
+        try:
+            em = Expectativas()
+            ep = em.get_endpoint('ExpectativasMercadoAnuais')
+            
+            df_raw = (ep.query()
+                      .filter(ep.Data >= data_inicio)
+                      .filter(ep.baseCalculo == 0)
+                      .select(ep.Data, ep.Indicador, ep.DataReferencia, ep.Mediana, ep.numeroRespondentes)
+                      .collect())
+            sucesso_api = True
+            break # Sai do loop se deu certo
+            
+        except Exception as e:
+            print(f"  [Aviso] Falha na tentativa {tentativa}/5: O servidor do BCB rejeitou a conexão ou retornou dados inválidos. Aguardando 5s...")
+            time.sleep(5) # Pausa para o firewall "esquecer" o IP
+            
+    if not sucesso_api or df_raw.empty:
+        print("[ERRO] API do BCB indisponível no momento ou sem dados novos. Os gráficos usarão a base existente.")
         return
 
     # 3. Filtragem e Renomeação (Tidy Data)
@@ -102,8 +106,6 @@ def atualizar_dados_api(proj_dir, data_inicio, arquivo):
     
     # Mantém apenas o último registro de cada semana (Sexta-feira ou véspera útil)
     df_final = df_final.drop_duplicates(subset=['ano_semana', 'indicador', 'periodo_previsao'], keep='last')
-    
-    # Limpeza da coluna auxiliar
     df_final = df_final.drop(columns=['ano_semana'])
 
     # Remove previsões sobre o passado LOL
